@@ -1,11 +1,19 @@
 from django.shortcuts import render
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from .serializers import ProfileSerializers, InteractionSerializers
-from .models import Profile, Interaction
-from rest_framework import status
 from django.http import Http404, JsonResponse, HttpResponse
 from django.core import serializers
+
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework import status
+
+from django.urls import re_path 
+from rest_framework_swagger.views import get_swagger_view 
+schema_view = get_swagger_view(title='api') 
+urlpatterns = [ re_path(r'^$', schema_view) ] 
+
+from .serializers import ProfileSerializers, InteractionSerializers
+from .models import Profile, Interaction
+
 import networkx as nx
 
 
@@ -109,7 +117,6 @@ class Graph_APIView(APIView):
         
 class Graph_edge_APIView(APIView):
     def post(self, request, format=None):
-        #print(request.data)   
         G = nx.Graph()
         vertices=Profile.objects.all()
         source=Profile.objects.get(id=request.data['source'])
@@ -119,7 +126,7 @@ class Graph_edge_APIView(APIView):
             edges=Interaction.objects.all()
             for edge in edges:
                 G.add_edge(edge.profile_right,edge.profile_left,weight=1)
-              
+                
         lange= nx.shortest_path(G,source ,tarjet)
         serializer = ProfileSerializers(lange, many=True)
         
