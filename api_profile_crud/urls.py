@@ -14,5 +14,5 @@ urlpatterns = [
     
     #Graph
     path('frens/<int:pk>/', Graph_APIView.as_view()),    
-
+    path('frens', Graph_edge_APIView.as_view()),    
 ]

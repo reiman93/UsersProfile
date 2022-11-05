@@ -6,6 +6,7 @@ from .models import Profile, Interaction
 from rest_framework import status
 from django.http import Http404, JsonResponse, HttpResponse
 from django.core import serializers
+import networkx as nx
 
 
 class Profile_APIView(APIView):   
@@ -96,33 +97,34 @@ class Graph_APIView(APIView):
             frens=[]
             for i in interactions:
                 if  i.profile_right.id==pk:
-                    frens.append(i.profile_left)   
+                    frens.append(i.profile_left.id)   
                 if  i.profile_left.id==pk:
-                    frens.append(i.profile_right)    
-            print(len(frens))  
+                    frens.append(i.profile_right.id)    
             
-            frens=serializers.serialize("json",frens)   
-            return HttpResponse(frens,content_type="json-comment-filtered")
+            frens= Profile.objects.filter(id__in=frens)
+            serializer = ProfileSerializers(frens, many=True)
         
-        def post(self, request, format=None):
-            source=request.data["source"]
-            tarjet=request.data["tarjet"]
-            interactions = Interaction.objects.all()
-            vertices=[]
-            distances=[]
-            
-            for i in interactions:
-                if  i.profile_right.id==source and i.profile_right.id not in vertices:
-                    vertices.append(i.profile_left.id)   
-                if  i.profile_left.id==source and i.profile_left.idnot not in vertices:
-                    vertices.append(i.profile_right.id)  
-            c=0
-            for j in vertices:
-                for k in interactions:
-                    if  k.profile_right.id==j and k.profile_right.id not in vertices:
-                        vertices.append(i.profile_left.id)   
-                    if  i.profile_left.id==source and i.profile_left.idnot not in vertices:
-                        vertices.append(i.profile_right.id)  
+            return Response(serializer.data)    
+
+        
+class Graph_edge_APIView(APIView):
+    def post(self, request, format=None):
+        #print(request.data)   
+        G = nx.Graph()
+        vertices=Profile.objects.all()
+        source=Profile.objects.get(id=request.data['source'])
+        tarjet=Profile.objects.get(id=request.data['tarjet'])
+        for vertice in vertices:
+            G.add_node(vertice)            
+            edges=Interaction.objects.all()
+            for edge in edges:
+                G.add_edge(edge.profile_right,edge.profile_left,weight=1)
+              
+        lange= nx.shortest_path(G,source ,tarjet)
+        serializer = ProfileSerializers(lange, many=True)
+        
+        return Response(serializer.data)   
+
                 
                 
             
