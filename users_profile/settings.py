@@ -38,10 +38,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'api_profile_crud',
     'rest_framework',
     'rest_framework_swagger',
     'django_seed',
+    'drf_yasg',
+    'api_profile_crud',
 ]
 
 MIDDLEWARE = [
@@ -73,8 +74,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'users_profile.wsgi.application'
-
+#WSGI_APPLICATION = 'users_profile.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases

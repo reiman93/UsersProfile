@@ -11,12 +11,10 @@ from rest_framework import status
 from api_profile_crud.models import Profile
 
 class ProfileTestCase(TestCase):
-
-    
+   
     def test_create_profile(self):
 
         client = APIClient()
-       # client.credentials(HTTP_AUTHORIZATION='Token ' + self.access_token)
 
         test_profile = {
             "first_name": "Steph",
@@ -64,6 +62,7 @@ class ProfileTestCase(TestCase):
         )
 
         test_profile = {
+            'img': None,
             "first_name":"Steph",
             "last_name":"Walters",
             "phone":"(820) 289-1818",
@@ -79,8 +78,9 @@ class ProfileTestCase(TestCase):
             test_profile,
             format='json'
         )
-
+        
         result = json.loads(response.content)
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         if 'id' in result:
             del result['id']
@@ -102,17 +102,12 @@ class ProfileTestCase(TestCase):
             zipcode="77370",
             available=True
         )
-        print("********************************************************")
-        print(prof.id)
-        print("********************************************************")
-        print("service")
         
         response = client.delete(
             '/profile/profile/{0}/'.format(prof.id), 
             format='json'
         )
-        print("****************************url**************")
-        print(response)
+  
         
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
@@ -175,3 +170,4 @@ class ProfileTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         self.assertEqual(len(result), 4)
+        
